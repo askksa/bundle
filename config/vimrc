@@ -1,0 +1,213 @@
+"============================ my plugins start =============================
+set nocompatible " be iMproved, required
+filetype off " required
+
+"set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+Plugin 'nerdtree.vim'
+Plugin 'taglist.vim'
+Plugin 'indentLine.vim'
+Plugin 'minibufexpl.vim'
+Plugin 'LeaderF.vim'
+Plugin 'cscope.vim'
+Plugin 'AutoComplPop.vim'
+Plugin 'supertab.vim'
+Plugin 'vim-terwin.vim'
+Plugin 'Mark.vim'
+call vundle#end() " required
+
+filetype plugin indent on " required
+
+"============================ my plugins end=============================
+syntax enable
+syntax on
+set background=dark
+set t_Co=256
+colorscheme default
+hi VertSplit ctermfg=238 ctermbg=238
+hi User1 cterm=None ctermfg=208 ctermbg=238
+set statusline=%1*<%F>%r%m%=[Line:%l/%L,Column:%c][%p%%]%*
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+set fileformats=unix,dos
+set scrolloff=3
+set number
+set cmdheight=1
+set confirm
+set autoindent
+set tabstop=4
+set expandtab
+set softtabstop=4
+set shiftwidth=4
+set backspace=2
+set laststatus=2
+set ignorecase
+set nopaste
+set cursorline
+set mouse=n
+set selection=exclusive
+set selectmode=mouse,key
+set foldmethod=syntax
+set foldlevel=100
+set autoread
+set autowrite
+set nobackup
+set noswapfile
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+nnoremap mn :set number<cr>
+nnoremap nm :set nonumber<cr>
+nnoremap ww :set ff=unix<cr>:w<cr>
+nnoremap qq :q!<cr>
+nnoremap . :pwd<cr>
+nnoremap - ddp
+nnoremap = dd2kp
+nnoremap <C-A> <Esc>ggVGy
+nnoremap <C-X> <Esc>ggVGd
+nnoremap <C-H> <C-W>h
+nnoremap <C-L> <C-W>l
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+inoremap <C-H> <Esc>i
+inoremap <C-L> <Esc>la
+inoremap <C-J> <Esc>j$a
+inoremap <C-K> <Esc>k$a
+
+"============== indentLine ================
+let g:indentLine_char = '¦'
+let g:indentLine_showFirstIndentLevel = 1
+let g:indentLine_color_term = 125
+
+"============== mark =================
+nmap <silent><F9> \m
+nmap <silent><F10> :MarkClear<cr>
+
+"========== NERDTree ==============
+nnoremap nt :NERDTreeToggle<cr>
+let g:NERDTree_title = "[NERDTree]"
+let NERDChristmasTree = 1
+let NERDTreeAutoCenter = 1
+let NERDTreeShowBookmarks = 0
+let NERDTreeMouseMode = 1
+let NERDTreeShowHidden = 1
+let NERDTreeMinimalUI = 1
+let NERDTreeWinSize = 20
+let NERDTreeWinPos = "left"
+let NERDTreeAutoDeleteBuffer = 1
+let g:NERDTreeDirArrowExpandable = '+'
+let g:NERDTreeDirArrowCollapsible = '-'
+au bufenter * if 0==len(filter(range(1, winnr('$')),'empty(getbufvar(winbufnr(v:val), "&bt"))'))|qa!|endif
+
+"============== TagList ====================
+nnoremap tl :TlistToggle<cr>
+let Tlist_Ctags_Cmd='/usr/bin/ctags'
+let Tlist_Close_On_Select = 0
+let Tlist_Use_SingleClick = 0
+let TlistHighlightTag = 1
+let Tlist_Use_Right_Window = 1
+let Tlist_WinWidth = 20
+let Tlist_Exit_OnlyWindow=1
+let Tlist_Show_One_File=1
+let Tlist_Auto_Update=1
+
+"============== miniBufexplorer ===============
+let g:bfirst = 0
+function! MBEToggleCustomer()
+    if(g:bfirst == 0)
+        let g:startdir = getcwd()
+        let g:bfirst = 1
+    endif
+    cd "startdir"
+    execute 'MBEToggle'
+    cd -
+endfunction
+nnoremap fl :call MBEToggleCustomer()<CR>
+let g:miniBufExplorerAutoStart = 0
+let g:miniBufExplVSplit = 30
+let g:miniBufExplMaxSize = 30
+let g:miniBufExplBRSplit = 1
+let g:miniBufExplUseSingleClick = 0
+let g:miniBufExplShowBufNumbers = 0
+let g:miniBufExplCloseOnSelect = 1
+
+"============== cscope ====================
+let g:cscope_open_location = 1
+let g:cscope_auto_update = 0
+
+function! CscopeFilterFiles()
+    let g:cscope_ignored_file = '\.bin$\|\.exe$'
+    let g:cscope_ignored_dir = '\.git$\|\.svn$\|alpha$\|arc$\|arm64$\|avr32$\|blackfin$\|c6x$\|cris$\|frv$\|h8300$\|hexagon$\|ia64$\|m32r$\|m68k$\|metag$\|microblaze$\|mips$\|mn10300$\|nios2$\|openrisc$\|parisc$\|powerpc$\|s390$\|score$\|sh$\|sparc$\|tile$\|um$\|unicore32$\|x86$\|xtensa$\|nds32$\|riscv$\|sandbox$'
+    let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.cfg$\|\.conf$\|\.config$\|\.h++$\|\.ini$\|\.mk$\|\.py$\|\.sh$\|\.config.*$\|config.*$\|makefile\|Makefile|\Kconfig'
+    let curdir = substitute(getcwd(),'\\','/','g')
+    if stridx(curdir,$HOME."/SI/develop_alkaid") == 0
+        let g:cscope_interested_dir = 'sdk\|kernel'
+        let g:cscope_ignored_dir .= '\|doc$\|i2$\|k6$\|k6l$'
+    elseif stridx(curdir,$HOME."/SI/stable_alkaid") == 0
+        let g:cscope_interested_dir = 'sdk\|kernel'
+        let g:cscope_ignored_dir .= '\|doc$\|k6$\|k6l$'
+    elseif stridx(curdir,$HOME."/SI/master_alkaid") == 0
+        let g:cscope_interested_dir = 'sdk\|kernel'
+        let g:cscope_ignored_dir .= '\|doc$\|i2$\|k6$\|k6l$'
+    elseif stridx(curdir,$HOME."/SI/nvr_alkaid") == 0
+        let g:cscope_interested_dir = 'sdk\|kernel'
+        let g:cscope_ignored_dir .= '\|doc$\|i5$\|i6$\|i2m$\|i6b0$\|i6e$'
+    elseif stridx(curdir,$HOME."/github/mywork") == 0
+        let g:cscope_interested_dir = 'workstation$\|kernel'
+    endif
+endfunction
+
+function! CscopeUpdateDBCfg()
+    call CscopeFilterFiles()
+    call CscopeUpdateDB()
+    if exists('g:cscope_interested_dir')
+        unlet g:cscope_interested_dir
+    endif
+    if exists('g:cscope_interested_files')
+        unlet g:cscope_interested_files
+    endif
+    if exists('g:cscope_ignored_dir')
+        unlet g:cscope_ignored_dir
+    endif
+    if exists('g:cscope_ignored_file')
+        unlet g:cscope_ignored_file
+    endif
+endfunction
+
+nnoremap <F1> <C-O>
+nnoremap <F2> :call ToggleLocationList()<CR>
+nnoremap <F3> :call CscopeFind('g', expand('<cword>'))<CR>
+nnoremap <F4> :call CscopeFind('c', expand('<cword>'))<CR>
+nnoremap <F5> :call CscopeFind('s', expand('<cword>'))<CR>
+nnoremap <F6> :call CscopeFindInteractive(expand('<cword>'))<CR>
+nnoremap <F12> :call CscopeUpdateDBCfg()<CR>
+
+com! -nargs=0 CscopeUpdate call CscopeUpdateDBCfg()
+
+"============== LeaderF =====================
+"Searcher rg address https://github.com/BurntSushi/ripgrep/releases
+let g:Lf_DefaultExternalTool = "rg"
+let g:Lf_WindowHeight = 0.20
+let g:Lf_ShowHidden = 1
+let g:Lf_UseVersionControlTool = 0
+let g:Lf_WildIgnore = {
+            \ 'dir': ['.svn','.git'],
+            \ 'file': ['*.bak','*.exe','*.o','*.*.o','*.so',
+            \           '*.*cmd','.mod*','*.a','*.bin','*.dat','*.ko','.*.o.cmd']
+            \}
+nnoremap <silent> <C-P> :LeaderfFile<CR>
+nnoremap <silent> <C-B> :LeaderfBufTag<CR>
+nnoremap <silent> <C-F> :LeaderfFunction<CR>
+
+"============== autocomplpop =====================
+let g:acp_behaviorKeywordLength = 3
+
+"============== vim mergetool =============
+nnoremap m1 :diffget 1<CR> :diffupdate<CR>
+nnoremap m2 :diffget 2<CR> :diffupdate<CR>
+nnoremap m3 :diffget 3<CR> :diffupdate<CR>
+nnoremap m4 :diffget 4<CR> :diffupdate<CR>
+
+"============== terminal windows =================
+nnoremap <silent> <C-@> :TerWinToggle<CR>
