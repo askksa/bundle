@@ -1,0 +1,17 @@
+'g:cscope_auto_update'	cscope.txt	/*'g:cscope_auto_update'*
+'g:cscope_cmd'	cscope.txt	/*'g:cscope_cmd'*
+'g:cscope_ignored_dir'	cscope.txt	/*'g:cscope_ignored_dir'*
+'g:cscope_interested_files'	cscope.txt	/*'g:cscope_interested_files'*
+'g:cscope_open_location'	cscope.txt	/*'g:cscope_open_location'*
+'g:cscope_preload_path'	cscope.txt	/*'g:cscope_preload_path'*
+'g:cscope_silent'	cscope.txt	/*'g:cscope_silent'*
+'g:cscope_split_threshold'	cscope.txt	/*'g:cscope_split_threshold'*
+CscopeClear	cscope.txt	/*CscopeClear*
+CscopeList	cscope.txt	/*CscopeList*
+cscove	cscope.txt	/*cscove*
+cscove-about	cscope.txt	/*cscove-about*
+cscove-commands	cscope.txt	/*cscove-commands*
+cscove-functions	cscope.txt	/*cscove-functions*
+cscove-keymappings	cscope.txt	/*cscove-keymappings*
+cscove-options	cscope.txt	/*cscove-options*
+cscove.txt	cscope.txt	/*cscove.txt*
