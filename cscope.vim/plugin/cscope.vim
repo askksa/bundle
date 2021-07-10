@@ -256,15 +256,8 @@ function! s:AutoloadDB(dir)
   let ret = 0
   let m_dir = <SID>GetBestPath(a:dir)
   if m_dir == ""
-    echohl WarningMsg | echo "Can not find proper cscope db, please input project path to generate cscope db for." | echohl None
-    let m_dir = input("", a:dir, 'dir')
-    if m_dir != ''
-      let m_dir = <SID>CheckAbsolutePath(m_dir, a:dir)
-      call <SID>InitDB(m_dir)
-      call <SID>LoadDB(m_dir)
-    else
-      let ret = 1
-    endif
+    echohl WarningMsg | echo "Can not find proper cscope db." | echohl None
+    let ret = 1
   else
     let id = s:dbs[m_dir]['id']
     if cscope_connection(2, s:cscope_vim_dir.'/'.id.'.db') == 0
