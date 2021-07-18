@@ -77,13 +77,16 @@ function! s:ListFiles(dir)
           if !exists('g:cscope_ignored_dir') || fn !~? g:cscope_ignored_dir
             call add(d, fn)
           endif
-        elseif getftype(fn) != 'file' || fn =~? g:cscope_ignored_file
-          continue
-        elseif fn =~? g:cscope_interested_files
-          if stridx(fn, ' ') != -1
-            let fn = '"'.fn.'"'
+        elseif getftype(fn) == 'file'
+          if exists('g:cscope_interested_files') && fn !~? g:cscope_interested_files
+            continue
           endif
-          call add(f, fn)
+          if !exists('g:cscope_ignored_file') || fn !~? g:cscope_ignored_file
+            if stridx(fn, ' ') != -1
+              let fn = '"'.fn.'"'
+            endif
+            call add(f, fn)
+          endif
         endif
       endfor
 
@@ -97,13 +100,16 @@ function! s:ListFiles(dir)
           if !exists('g:cscope_ignored_dir') || fn !~? g:cscope_ignored_dir
             call add(d, fn)
           endif
-        elseif getftype(fn) != 'file' || fn =~? g:cscope_ignored_file
-          continue
-        elseif fn =~? g:cscope_interested_files
-          if stridx(fn, ' ') != -1
-            let fn = '"'.fn.'"'
+        elseif getftype(fn) == 'file'
+          if exists('g:cscope_interested_files') && fn !~? g:cscope_interested_files
+            continue
           endif
-          call add(f, fn)
+          if !exists('g:cscope_ignored_file') || fn !~? g:cscope_ignored_file
+            if stridx(fn, ' ') != -1
+              let fn = '"'.fn.'"'
+            endif
+            call add(f, fn)
+          endif
         endif
       endfor
       let cwd = len(d) ? remove(d, 0) : ''
