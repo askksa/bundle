@@ -57,6 +57,7 @@ set autowrite
 set nobackup
 set noswapfile
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+nnoremap mm <Esc>daw
 nnoremap mn :set number<cr>
 nnoremap nm :set nonumber<cr>
 nnoremap ww :set ff=unix<cr>:w<cr>
@@ -94,7 +95,7 @@ let NERDTreeMouseMode = 1
 let NERDTreeShowHidden = 1
 let NERDTreeMinimalUI = 1
 let NERDTreeWinSize = 20
-let NERDTreeWinPos = "left"
+let NERDTreeWinPos = "right"
 let NERDTreeAutoDeleteBuffer = 1
 let g:NERDTreeDirArrowExpandable = '+'
 let g:NERDTreeDirArrowCollapsible = '-'
@@ -106,7 +107,7 @@ let Tlist_Ctags_Cmd='/usr/bin/ctags'
 let Tlist_Close_On_Select = 0
 let Tlist_Use_SingleClick = 0
 let TlistHighlightTag = 1
-let Tlist_Use_Right_Window = 1
+let Tlist_Use_Right_Window = 0
 let Tlist_WinWidth = 20
 let Tlist_Exit_OnlyWindow=1
 let Tlist_Show_One_File=1
@@ -155,6 +156,18 @@ function! CscopeFilterFiles()
         let g:cscope_ignored_dir .= '\|doc$\|i5$\|i6$\|i2m$\|i6b0$\|i6e$'
     elseif stridx(curdir,$HOME."/github/mywork") == 0
         let g:cscope_interested_dir = 'workstation$\|kernel'
+    endif
+
+    let dirstr = input("please input interested dir:\n")
+    if dirstr != ''
+        if exists('g:cscope_interested_dir')
+            let g:cscope_interested_dir .= '\|'.join(split(dirstr), '\|')
+        else
+            let g:cscope_interested_dir = join(split(dirstr), '\|')
+        endif
+    endif
+    if exists('g:cscope_interested_dir')
+        echo "\ncscope interested dirs => ".g:cscope_interested_dir
     endif
 endfunction
 
