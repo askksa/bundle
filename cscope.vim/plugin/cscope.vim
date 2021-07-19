@@ -409,19 +409,24 @@ endfunction
 function! CscopeUpdateDB()
   let m_dir = <SID>GetBestPath(expand('%:p:h'))
   if m_dir == ""
-    echohl WarningMsg | echo "Can not find proper cscope db, please input project path to generate cscope db for." | echohl None
-    let m_dir = input("", expand('%:p:h'), 'dir')
-    if m_dir != ''
-      let m_dir = <SID>CheckAbsolutePath(m_dir, expand('%:p:h'))
-      call <SID>InitDB(m_dir)
-      call <SID>LoadDB(m_dir)
-    endif
+    echohl WarningMsg | echo "Can not find proper cscope db, please generate cscope db by CsCreateDb cmd." | echohl None
   else
     call <SID>CheckNewFile(m_dir, expand('%:p'))
     call <SID>CreateDB(m_dir)
   endif
 endfunction
 
+function! CscopeCreateDB()
+    echohl WarningMsg | echo "please input project path for generating cscope db." | echohl None
+    let m_dir = input("", expand('%:p:h'), 'dir')
+    if m_dir != ''
+      let m_dir = <SID>CheckAbsolutePath(m_dir, expand('%:p:h'))
+      call <SID>InitDB(m_dir)
+      call <SID>LoadDB(m_dir)
+    else
+      echohl WarningMsg | echo "invalid project path !!!" | echohl None
+    endif
+endfunction
 
 if exists('g:cscope_preload_path')
   call <SID>preloadDB()

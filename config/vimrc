@@ -137,26 +137,10 @@ let g:miniBufExplCloseOnSelect = 1
 let g:cscope_open_location = 1
 let g:cscope_auto_update = 0
 
-function! CscopeFilterFiles()
+function! CscopeFilterRules()
     let g:cscope_ignored_file = '\.bin$\|\.exe$'
     let g:cscope_ignored_dir = '\.git$\|\.svn$\|alpha$\|arc$\|arm64$\|avr32$\|blackfin$\|c6x$\|cris$\|frv$\|h8300$\|hexagon$\|ia64$\|m32r$\|m68k$\|metag$\|microblaze$\|mips$\|mn10300$\|nios2$\|openrisc$\|parisc$\|powerpc$\|s390$\|score$\|sh$\|sparc$\|tile$\|um$\|unicore32$\|x86$\|xtensa$\|nds32$\|riscv$\|sandbox$'
     let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.cfg$\|\.conf$\|\.config$\|\.h++$\|\.ini$\|\.mk$\|\.py$\|\.sh$\|\.config.*$\|config.*$\|makefile\|Makefile|\Kconfig'
-    let curdir = substitute(getcwd(),'\\','/','g')
-    if stridx(curdir,$HOME."/SI/develop_alkaid") == 0
-        let g:cscope_interested_dir = 'sdk\|kernel'
-        let g:cscope_ignored_dir .= '\|doc$\|i2$\|k6$\|k6l$'
-    elseif stridx(curdir,$HOME."/SI/stable_alkaid") == 0
-        let g:cscope_interested_dir = 'sdk\|kernel'
-        let g:cscope_ignored_dir .= '\|doc$\|k6$\|k6l$'
-    elseif stridx(curdir,$HOME."/SI/master_alkaid") == 0
-        let g:cscope_interested_dir = 'sdk\|kernel'
-        let g:cscope_ignored_dir .= '\|doc$\|i2$\|k6$\|k6l$'
-    elseif stridx(curdir,$HOME."/SI/nvr_alkaid") == 0
-        let g:cscope_interested_dir = 'sdk\|kernel'
-        let g:cscope_ignored_dir .= '\|doc$\|i5$\|i6$\|i2m$\|i6b0$\|i6e$'
-    elseif stridx(curdir,$HOME."/github/mywork") == 0
-        let g:cscope_interested_dir = 'workstation$\|kernel'
-    endif
 
     let dirstr = input("please input interested dir:\n")
     if dirstr != ''
@@ -171,9 +155,9 @@ function! CscopeFilterFiles()
     endif
 endfunction
 
-function! CscopeUpdateDBCfg()
-    call CscopeFilterFiles()
-    call CscopeUpdateDB()
+function! CscopeCreateDb()
+    call CscopeFilterRules()
+    call CscopeCreateDB()
     if exists('g:cscope_interested_dir')
         unlet g:cscope_interested_dir
     endif
@@ -188,15 +172,15 @@ function! CscopeUpdateDBCfg()
     endif
 endfunction
 
+com! -nargs=0 CsCreateDb call CscopeCreateDb()
+
 nnoremap <F1> <C-O>
 nnoremap <F2> :call ToggleLocationList()<CR>
 nnoremap <F3> :call CscopeFind('g', expand('<cword>'))<CR>
 nnoremap <F4> :call CscopeFind('c', expand('<cword>'))<CR>
 nnoremap <F5> :call CscopeFind('s', expand('<cword>'))<CR>
 nnoremap <F6> :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <F12> :call CscopeUpdateDBCfg()<CR>
-
-com! -nargs=0 CscopeUpdate call CscopeUpdateDBCfg()
+nnoremap <F12> :call CscopeUpdateDB()<CR>
 
 "============== LeaderF =====================
 "Searcher rg address https://github.com/BurntSushi/ripgrep/releases
