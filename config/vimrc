@@ -9,13 +9,16 @@ call vundle#begin()
 Plugin 'nerdtree.vim'
 Plugin 'taglist.vim'
 Plugin 'indentLine.vim'
+Plugin 'vim-airline.vim'
+Plugin 'vim-airline-themes.vim'
 Plugin 'minibufexpl.vim'
 Plugin 'LeaderF.vim'
 Plugin 'cscope.vim'
-Plugin 'AutoComplPop.vim'
-Plugin 'supertab.vim'
 Plugin 'vim-terwin.vim'
 Plugin 'Mark.vim'
+Plugin 'coc.nvim'
+"Plugin 'AutoComplPop.vim'
+"Plugin 'supertab.vim'
 call vundle#end() " required
 
 filetype plugin indent on " required
@@ -28,7 +31,7 @@ set t_Co=256
 colorscheme default
 hi VertSplit ctermfg=238 ctermbg=238
 hi User1 cterm=None ctermfg=208 ctermbg=238
-set statusline=%1*<%F>%r%m%=[Line:%l/%L,Column:%c][%p%%]%*
+"set statusline=%1*<%F>%r%m%=[Line:%l/%L,Column:%c][%p%%]%*
 set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
 set termencoding=utf-8
 set encoding=utf-8
@@ -80,6 +83,15 @@ inoremap <C-K> <Esc>k$a
 let g:indentLine_char = '¦'
 let g:indentLine_showFirstIndentLevel = 1
 let g:indentLine_color_term = 125
+
+"============== airline ================
+let g:airline_theme = 'dark'
+let g:airline_powerline_fonts = 1
+let g:airline_skip_empty_sections = 1
+let g:airline_extensions = ['coc', 'whitespace']
+let g:airline#extensions#coc#enabled = 1
+let g:airline#extensions#whitespace#checks = ['trailing']
+let g:airline_section_z = airline#section#create(['ln:%l/%L,col:%v,%p%%'])
 
 "============== mark =================
 nmap <silent><F9> \m
@@ -198,7 +210,26 @@ nnoremap <silent> <C-B> :LeaderfBufTag<CR>
 nnoremap <silent> <C-F> :LeaderfFunction<CR>
 
 "============== autocomplpop =====================
-let g:acp_behaviorKeywordLength = 3
+"let g:acp_behaviorKeywordLength = 3
+
+"============== coc =====================
+let g:coc_global_extensions = [
+        \'coc-json', 'coc-clangd', 'coc-python',
+        \'coc-sh', 'coc-tsserver', 'coc-vimlsp']
+
+inoremap <silent><expr> <cr>
+        \ pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+        \ pumvisible() ? "\<C-n>" :
+        \ <SID>check_back_space() ? "\<Tab>" :
+        \ coc#refresh()
 
 "============== vim mergetool =============
 nnoremap m1 :diffget 1<CR> :diffupdate<CR>
