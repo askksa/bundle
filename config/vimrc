@@ -85,13 +85,13 @@ let g:indentLine_showFirstIndentLevel = 1
 let g:indentLine_color_term = 125
 
 "============== airline ================
-let g:airline_theme = 'dark'
+let g:airline_theme='dark'
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
+let g:airline_section_z = airline#section#create(['ln:%l/%L,col:%v,%p%%'])
 let g:airline_extensions = ['coc', 'whitespace']
 let g:airline#extensions#coc#enabled = 1
 let g:airline#extensions#whitespace#checks = ['trailing']
-let g:airline_section_z = airline#section#create(['ln:%l/%L,col:%v,%p%%'])
 
 "============== mark =================
 nmap <silent><F9> \m
@@ -152,7 +152,7 @@ let g:cscope_auto_update = 0
 function! CscopeFilterRules()
     let g:cscope_ignored_file = '\.bin$\|\.exe$'
     let g:cscope_ignored_dir = '\.git$\|\.svn$\|alpha$\|arc$\|arm64$\|avr32$\|blackfin$\|c6x$\|cris$\|frv$\|h8300$\|hexagon$\|ia64$\|m32r$\|m68k$\|metag$\|microblaze$\|mips$\|mn10300$\|nios2$\|openrisc$\|parisc$\|powerpc$\|s390$\|score$\|sh$\|sparc$\|tile$\|um$\|unicore32$\|x86$\|xtensa$\|nds32$\|riscv$\|sandbox$'
-    let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.cfg$\|\.conf$\|\.config$\|\.h++$\|\.ini$\|\.mk$\|\.py$\|\.sh$\|\.config.*$\|config.*$\|makefile\|Makefile|\Kconfig'
+    let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.h++$'
 
     let dirstr = input("please input interested dir:\n")
     if dirstr != ''
@@ -165,6 +165,20 @@ function! CscopeFilterRules()
     if exists('g:cscope_interested_dir')
         echo "\ncscope interested dirs => ".g:cscope_interested_dir
     endif
+    unlet dirstr
+
+    let dirstr = input("please input ignored dir:\n")
+    if dirstr != ''
+        if exists('g:cscope_ignored_dir')
+            let g:cscope_ignored_dir .= '\|'.join(map(split(dirstr), 'v:val."$"'), '\|')
+        else
+            let g:cscope_ignored_dir = join(map(split(dirstr), 'v:val."$"'), '\|')
+        endif
+    endif
+    if exists('g:cscope_ignored_dir')
+        echo "\ncscope ignored dirs => ".g:cscope_ignored_dir
+    endif
+    unlet dirstr
 endfunction
 
 function! CscopeCreateDb()
@@ -212,13 +226,13 @@ nnoremap <silent> <C-F> :LeaderfFunction<CR>
 "============== autocomplpop =====================
 "let g:acp_behaviorKeywordLength = 3
 
-"============== coc =====================
+"============== coc ===============
 let g:coc_global_extensions = [
-        \'coc-json', 'coc-clangd', 'coc-python',
-        \'coc-sh', 'coc-tsserver', 'coc-vimlsp']
+                    \'coc-json', 'coc-clangd', 'coc-python',
+                    \'coc-sh', 'coc-tsserver', 'coc-vimlsp']
 
 inoremap <silent><expr> <cr>
-        \ pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+    \ pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
@@ -227,9 +241,9 @@ function! s:check_back_space() abort
 endfunction
 
 inoremap <silent><expr> <Tab>
-        \ pumvisible() ? "\<C-n>" :
-        \ <SID>check_back_space() ? "\<Tab>" :
-        \ coc#refresh()
+    \ pumvisible() ? "\<C-n>" :
+    \ <SID>check_back_space() ? "\<Tab>" :
+    \ coc#refresh()
 
 "============== vim mergetool =============
 nnoremap m1 :diffget 1<CR> :diffupdate<CR>
