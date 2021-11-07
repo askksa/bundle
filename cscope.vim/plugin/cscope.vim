@@ -384,10 +384,13 @@ function! CscopeFind(action, word)
   let dbl = <SID>AutoloadDB(expand('%:p:h'))
   if dbl == 0
     try
-      exe ':lcs f '.a:action.' '.a:word
+      execute "normal mZ"
+      execute "lcs find ".a:action." ".a:word
       if g:cscope_open_location == 1
-        lw
+        execute "lopen 6"
       endif
+      execute "wincmd p"
+      execute "normal `Z"
     catch
       echohl WarningMsg | echo 'Can not find '.a:word.' with querytype as '.a:action.'.' | echohl None
     endtry
