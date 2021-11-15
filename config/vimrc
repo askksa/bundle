@@ -151,7 +151,7 @@ let g:cscope_auto_update = 0
 
 function! CscopeFilterRules()
     let g:cscope_ignored_file = '\.bin$\|\.exe$'
-    let g:cscope_ignored_dir = '\.git$\|\.svn$\|alpha$\|arc$\|arm64$\|avr32$\|blackfin$\|c6x$\|cris$\|frv$\|h8300$\|hexagon$\|ia64$\|m32r$\|m68k$\|metag$\|microblaze$\|mips$\|mn10300$\|nios2$\|openrisc$\|parisc$\|powerpc$\|s390$\|score$\|sh$\|sparc$\|tile$\|um$\|unicore32$\|x86$\|x86_64$\|xtensa$\|nds32$\|riscv$\|sandbox$'
+    let g:cscope_ignored_dir = '\*\*$\|\.repo$\|\.git$\|\.svn$\|x86$\|x86_64$'
     let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.h++$'
 
     let dirstr = input("please input interested dir:\n")
