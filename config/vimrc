@@ -214,8 +214,9 @@ let g:Lf_DefaultExternalTool = "rg"
 let g:Lf_WindowHeight = 0.20
 let g:Lf_ShowHidden = 1
 let g:Lf_UseVersionControlTool = 0
+let g:Lf_DelimiterChar = ' '
 let g:Lf_WildIgnore = {
-            \ 'dir': ['.svn','.git'],
+            \ 'dir': ['.repo','.svn','.git'],
             \ 'file': ['*.bak','*.exe','*.o','*.*.o','*.so',
             \           '*.*cmd','.mod*','*.a','*.bin','*.dat','*.ko','.*.o.cmd']
             \}
