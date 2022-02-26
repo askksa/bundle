@@ -1,0 +1,34 @@
+{
+    "cs_search_dirs" :
+    [],
+
+    "cs_ignore_dirs" :
+    [
+      "alpha",
+      "arc",
+      "csky", 
+      "h8300", 
+      "hexagon", 
+      "ia64", 
+      "m68k", 
+      "microblaze", 
+      "mips", 
+      "nds32", 
+      "nios2", 
+      "openrisc",
+      "parisc",
+      "powerpc",
+      "riscv",
+      "sh",
+      "sparc",
+      "um",
+      "x86",
+      "xtensa"
+    ],
+
+    "cs_interested_files" :
+    [],
+
+    "cs_ignore_files" :
+    []
+}

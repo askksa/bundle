@@ -5,6 +5,22 @@
 
 set cscopequickfix=s-,g-,d-,c-,t-,e-,f-,i-
 
+if has("python3")
+  let g:cs_py = "py3 "
+elseif has("python")
+  let g:cs_py = "py "
+else
+  echohl Error
+  echo "Error: cscope requires vim compiled with +python or +python3"
+  echohl None
+  finish
+endif
+
+exec g:cs_py "import vim, sys, os.path"
+exec g:cs_py "cwd = vim.eval('expand(\"<sfile>:p:h\")')"
+exec g:cs_py "sys.path.insert(0, os.path.join(cwd, 'python'))"
+exec g:cs_py "from filter_rules_parser import parsing_rules"
+
 if !exists('g:cscope_silent')
   let g:cscope_silent = 0
 endif
@@ -25,7 +41,7 @@ if !exists('g:cscope_cmd')
   if executable('cscope')
     let g:cscope_cmd = 'cscope'
   else
-    call <SID>echo('cscope: command not found')
+    call <SID>Echo('cscope: command not found')
     finish
   endif
 endif
@@ -39,13 +55,13 @@ let s:cscope_vim_dir = substitute($HOME,'\\','/','g')."/.cscope.vim"
 let s:index_file = s:cscope_vim_dir.'/index'
 
 
-function! s:echo(msg)
+function! s:Echo(msg)
   if g:cscope_silent == 0
     echo a:msg
   endif
 endfunction
 
-function! s:listDirs(A,L,P)
+function! s:ListDirs(A,L,P)
   return keys(s:dbs)
 endfunction
 
@@ -60,6 +76,24 @@ function! s:GetBestPath(dir)
   return bestDir
 endfunction
 
+function! s:CheckAbsolutePath(dir, defaultPath)
+  let d = a:dir
+  while 1
+    if !isdirectory(d)
+      echohl WarningMsg | echo "Please input a valid path." | echohl None
+      let d = input("", a:defaultPath, 'dir')
+    elseif (len(d) < 2 || (d[0] != '/' && d[1] != ':'))
+      echohl WarningMsg | echo "Please input an absolute path." | echohl None
+      let d = input("", a:defaultPath, 'dir')
+    else
+      break
+    endif
+  endwhile
+  let d = substitute(d,'\\','/','g')
+  let d = substitute(d,'/\+$','','')
+  return d
+endfunction
+
 function! s:ListFiles(dir)
   let d = []
   let f = []
@@ -71,17 +105,17 @@ function! s:ListFiles(dir)
       let a = split(globpath(cwd, "*"), "\n")
       for fn in a
         if getftype(fn) == 'dir'
-          if exists('g:cscope_interested_dir') && fn !~? g:cscope_interested_dir
+          if exists('g:merged_interested_dirs') && fn !~? g:merged_interested_dirs
             continue
           endif
-          if !exists('g:cscope_ignored_dir') || fn !~? g:cscope_ignored_dir
+          if !exists('g:merged_ignored_dirs') || fn !~? g:merged_ignored_dirs
             call add(d, fn)
           endif
         elseif getftype(fn) == 'file'
-          if exists('g:cscope_interested_files') && fn !~? g:cscope_interested_files
+          if exists('g:merged_interested_files') && fn !~? g:merged_interested_files
             continue
           endif
-          if !exists('g:cscope_ignored_file') || fn !~? g:cscope_ignored_file
+          if !exists('g:merged_ignored_files') || fn !~? g:merged_ignored_files
             if stridx(fn, ' ') != -1
               let fn = '"'.fn.'"'
             endif
@@ -94,17 +128,17 @@ function! s:ListFiles(dir)
       let a = split(globpath(cwd, ".[a-zA-Z0-9]*"), "\n")
       for fn in a
         if getftype(fn) == 'dir'
-          if exists('g:cscope_interested_dir') && fn !~? g:cscope_interested_dir
+          if exists('g:merged_interested_dirs') && fn !~? g:merged_interested_dirs
             continue
           endif
-          if !exists('g:cscope_ignored_dir') || fn !~? g:cscope_ignored_dir
+          if !exists('g:merged_ignored_dirs') || fn !~? g:merged_ignored_dirs
             call add(d, fn)
           endif
         elseif getftype(fn) == 'file'
-          if exists('g:cscope_interested_files') && fn !~? g:cscope_interested_files
+          if exists('g:merged_interested_files') && fn !~? g:merged_interested_files
             continue
           endif
-          if !exists('g:cscope_ignored_file') || fn !~? g:cscope_ignored_file
+          if !exists('g:merged_ignored_files') || fn !~? g:merged_ignored_files
             if stridx(fn, ' ') != -1
               let fn = '"'.fn.'"'
             endif
@@ -124,7 +158,7 @@ function! s:ListFiles(dir)
   return f
 endfunction
 
-function! s:RmDBfiles()
+function! s:RmDbfiles()
   let odbs = split(globpath(s:cscope_vim_dir, "*"), "\n")
   for f in odbs
     call delete(f)
@@ -177,7 +211,7 @@ function! JobCloseCb(buf)
   exec 'cs add '.s:cscope_db
 endfunction
 
-function! s:CreateDB(dir)
+function! s:CreateDb(dir)
   let id = s:dbs[a:dir]['id']
   let dirty = s:dbs[a:dir]['dirty']
   if dirty == 1
@@ -219,34 +253,16 @@ function! s:CreateDB(dir)
   endif
 endfunction
 
-function! s:CheckAbsolutePath(dir, defaultPath)
-  let d = a:dir
-  while 1
-    if !isdirectory(d)
-      echohl WarningMsg | echo "Please input a valid path." | echohl None
-      let d = input("", a:defaultPath, 'dir')
-    elseif (len(d) < 2 || (d[0] != '/' && d[1] != ':'))
-      echohl WarningMsg | echo "Please input an absolute path." | echohl None
-      let d = input("", a:defaultPath, 'dir')
-    else
-      break
-    endif
-  endwhile
-  let d = substitute(d,'\\','/','g')
-  let d = substitute(d,'/\+$','','')
-  return d
-endfunction
-
-function! s:InitDB(dir)
+function! s:InitDb(dir)
   let id = localtime()
   let s:dbs[a:dir] = {}
   let s:dbs[a:dir]['id'] = id
   let s:dbs[a:dir]['loadtimes'] = 0
   let s:dbs[a:dir]['dirty'] = 0
-  call <SID>CreateDB(a:dir)
+  call <SID>CreateDb(a:dir)
 endfunction
 
-function! s:LoadDB(dir)
+function! s:LoadDb(dir)
   cs kill -1
   exe 'cs add '.s:cscope_vim_dir.'/'.s:dbs[a:dir]['id'].'.db'
   if filereadable(s:cscope_vim_dir.'/'.s:dbs[a:dir]['id'].'_inc.db')
@@ -258,7 +274,7 @@ endfunction
 
 " 0 -- loaded
 " 1 -- cancelled
-function! s:AutoloadDB(dir)
+function! s:AutoLoadDb(dir)
   let ret = 0
   let m_dir = <SID>GetBestPath(a:dir)
   if m_dir == ""
@@ -267,13 +283,13 @@ function! s:AutoloadDB(dir)
   else
     let id = s:dbs[m_dir]['id']
     if cscope_connection(2, s:cscope_vim_dir.'/'.id.'.db') == 0
-      call <SID>LoadDB(m_dir)
+      call <SID>LoadDb(m_dir)
     endif
   endif
   return ret
 endfunction
 
-function! s:clearDB(dir)
+function! s:ClearDb(dir)
   cs kill -1
   if a:dir != ""
     echo "clear database:".a:dir.""
@@ -291,7 +307,7 @@ function! s:clearDB(dir)
   call <SID>FlushIndex()
 endfunction
 
-function! s:listDBs()
+function! s:ListDbs()
   let dirs = keys(s:dbs)
   if len(dirs) == 0
     echo "You have no cscope dbs now."
@@ -310,7 +326,7 @@ function! s:listDBs()
   endif
 endfunction
 
-function! s:loadIndex()
+function! s:LoadIndex()
   let s:dbs = {}
   if ! isdirectory(s:cscope_vim_dir)
     call mkdir(s:cscope_vim_dir)
@@ -320,7 +336,7 @@ function! s:loadIndex()
       let e = split(i, '|')
       if len(e) == 0
         call delete(s:index_file)
-        call <SID>RmDBfiles()
+        call <SID>RmDbfiles()
       else
         let db_file = s:cscope_vim_dir.'/'.e[1].'.db'
         if filereadable(db_file)
@@ -336,33 +352,19 @@ function! s:loadIndex()
       endif
     endfor
   else
-    call <SID>RmDBfiles()
+    call <SID>RmDbfiles()
   endif
 endfunction
 
-function! s:preloadDB()
+function! s:PreloadDb()
   let dirs = split(g:cscope_preload_path, ';')
   for m_dir in dirs
     let m_dir = <SID>CheckAbsolutePath(m_dir, m_dir)
     if ! has_key(s:dbs, m_dir)
-      call <SID>InitDB(m_dir)
+      call <SID>InitDb(m_dir)
     endif
-    call <SID>LoadDB(m_dir)
+    call <SID>LoadDb(m_dir)
   endfor
-endfunction
-
-function! s:SyncNewFile()
-  if expand('%:t') =~? g:cscope_interested_files
-    let m_dir = <SID>GetBestPath(expand('%:p:h'))
-    if m_dir != ""
-      let dbl = <SID>CheckNewFile(m_dir, expand('%:p'))
-      if dbl == 1
-        call <SID>CreateDB(m_dir)
-      endif
-      redraw
-      call <SID>echo('Your cscope db will be updated automatically, you can turn off this message by setting g:cscope_silent 1.')
-    endif
-  endif
 endfunction
 
 function! ToggleLocationList()
@@ -381,7 +383,7 @@ function! ToggleLocationList()
 endfunction
 
 function! CscopeFind(action, word)
-  let dbl = <SID>AutoloadDB(expand('%:p:h'))
+  let dbl = <SID>AutoLoadDb(expand('%:p:h'))
   if dbl == 0
     try
       execute "normal mZ"
@@ -409,39 +411,112 @@ function! CscopeFindInteractive(pat)
     call feedkeys("\<CR>")
 endfunction
 
-function! CscopeUpdateDB()
+function! CscopeUpdateDb()
   let m_dir = <SID>GetBestPath(expand('%:p:h'))
   if m_dir == ""
     echohl WarningMsg | echo "Can not find proper cscope db, please generate cscope db by CsCreateDb cmd." | echohl None
   else
     call <SID>CheckNewFile(m_dir, expand('%:p'))
-    call <SID>CreateDB(m_dir)
+    call <SID>CreateDb(m_dir)
   endif
 endfunction
 
-function! CscopeCreateDB()
+function! CscopeMergeFilterRules(dirs_1, dirs_2, files_1, files_2)
+  if exists('g:cscope_interested_dirs') && a:dirs_1 != ''
+    let g:merged_interested_dirs = g:cscope_interested_dirs.'\|'.a:dirs_1
+    echo "cs_interested_dirs => ".g:merged_interested_dirs
+  elseif exists('g:cscope_interested_dirs')
+    let g:merged_interested_dirs = g:cscope_interested_dirs
+    echo "cs_interested_dirs => ".g:merged_interested_dirs
+  elseif a:dirs_1 != ''
+    let g:merged_interested_dirs = a:dirs_1
+    echo "cs_interested_dirs => ".g:merged_interested_dirs
+  endif
+
+  if exists('g:cscope_ignored_dirs') && a:dirs_2 != ''
+    let g:merged_ignored_dirs = g:cscope_ignored_dirs.'\|'.a:dirs_2
+    echo "cs_ignored_dirs => ".g:merged_ignored_dirs
+  elseif exists('g:cscope_ignored_dirs')
+    let g:merged_ignored_dirs = g:cscope_ignored_dirs
+    echo "cs_ignored_dirs => ".g:merged_ignored_dirs
+  elseif a:dirs_2 != ''
+    let g:merged_ignored_dirs = a:dirs_2
+    echo "cs_ignored_dirs => ".g:merged_ignored_dirs
+  endif
+
+  if exists('g:cscope_interested_files') && a:files_1 != ''
+    let g:merged_interested_files = g:cscope_interested_files.'\|'.a:files_1
+    echo "cs_interested_files => ".g:merged_interested_files
+  elseif exists('g:cscope_interested_files')
+    let g:merged_interested_files = g:cscope_interested_files
+    echo "cs_interested_files => ".g:merged_interested_files
+  elseif a:files_1 != ''
+    let g:merged_interested_files = a:files_1
+    echo "cs_interested_files => ".g:merged_interested_files
+  endif
+
+  if exists('g:cscope_ignored_files') && a:files_2 != ''
+    let g:merged_ignored_files = g:cscope_ignored_files.'\|'.a:files_2
+    echo "cs_ignored_files => ".g:merged_ignored_files
+  elseif exists('g:cscope_ignored_files')
+    let g:merged_ignored_files = g:cscope_ignored_files
+    echo "cs_ignored_files => ".g:merged_ignored_files
+  elseif a:files_2 != ''
+    let g:merged_ignored_files = a:files_2
+    echo "cs_ignored_files => ".g:merged_ignored_files
+  endif
+endfunction
+
+function! s:CreateFilterRules(dir)
+  let rules_file = a:dir."/.cscope_config.json"
+  if filereadable(rules_file)
+    exec g:cs_py 'parsing_rules("'.rules_file.'")'
+  else
+    echohl WarningMsg | echo "no found cscope config file !!!" | echohl None
+  endif
+endfunction
+
+function! CscopeCreateDb()
     echohl WarningMsg | echo "please input project path for generating cscope db." | echohl None
     let m_dir = input("", expand('%:p:h'), 'dir')
     if m_dir != ''
       let m_dir = <SID>CheckAbsolutePath(m_dir, expand('%:p:h'))
-      call <SID>InitDB(m_dir)
-      call <SID>LoadDB(m_dir)
+      echo "\nproject path => ".m_dir
+      call <SID>CreateFilterRules(m_dir)
+      let ret = input("continue create: y/n ?\n")
+      if ret == 'y'
+        call <SID>InitDb(m_dir)
+        call <SID>LoadDb(m_dir)
+      endif
     else
       echohl WarningMsg | echo "invalid project path !!!" | echohl None
+    endif
+
+    if exists('g:merged_interested_dirs')
+        unlet g:merged_interested_dirs
+    endif
+    if exists('g:merged_interested_files')
+        unlet g:merged_interested_files
+    endif
+    if exists('g:merged_ignored_dirs')
+        unlet g:merged_ignored_dirs
+    endif
+    if exists('g:merged_ignored_files')
+        unlet g:merged_ignored_files
     endif
 endfunction
 
 if exists('g:cscope_preload_path')
-  call <SID>preloadDB()
+  call <SID>PreloadDb()
 endif
 
 if g:cscope_auto_update == 1
-  au BufWritePost * call <SID>SyncNewFile()
+  au BufWritePost * call CscopeUpdateDb()
 endif
 
-call <SID>loadIndex()
+call <SID>LoadIndex()
 
-com! -nargs=? CscopeClear call <SID>clearDB(<SID>GetBestPath(expand('%:p:h')))
-com! -nargs=0 CscopeList call <SID>listDBs()
-com! -nargs=0 RmCscopeDbs call <SID>RmDBfiles()
+com! -nargs=0 CsCreateDb call CscopeCreateDb()
+com! -nargs=1 CsClearDb call <SID>ClearDb('<args>')
+com! -nargs=0 CsListDbs call <SID>ListDbs()
 

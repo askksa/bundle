@@ -149,56 +149,9 @@ let g:miniBufExplCloseOnSelect = 1
 let g:cscope_open_location = 1
 let g:cscope_auto_update = 0
 
-function! CscopeFilterRules()
-    let g:cscope_ignored_file = '\.bin$\|\.exe$'
-    let g:cscope_ignored_dir = '\*\*$\|\.repo$\|\.git$\|\.svn$\|x86$\|x86_64$'
-    let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.h++$'
-
-    let dirstr = input("please input interested dir:\n")
-    if dirstr != ''
-        if exists('g:cscope_interested_dir')
-            let g:cscope_interested_dir .= '\|'.join(split(dirstr), '\|')
-        else
-            let g:cscope_interested_dir = join(split(dirstr), '\|')
-        endif
-    endif
-    if exists('g:cscope_interested_dir')
-        echo "\ncscope interested dirs => ".g:cscope_interested_dir
-    endif
-    unlet dirstr
-
-    let dirstr = input("please input ignored dir:\n")
-    if dirstr != ''
-        if exists('g:cscope_ignored_dir')
-            let g:cscope_ignored_dir .= '\|'.join(map(split(dirstr), 'v:val."$"'), '\|')
-        else
-            let g:cscope_ignored_dir = join(map(split(dirstr), 'v:val."$"'), '\|')
-        endif
-    endif
-    if exists('g:cscope_ignored_dir')
-        echo "\ncscope ignored dirs => ".g:cscope_ignored_dir
-    endif
-    unlet dirstr
-endfunction
-
-function! CscopeCreateDb()
-    call CscopeFilterRules()
-    call CscopeCreateDB()
-    if exists('g:cscope_interested_dir')
-        unlet g:cscope_interested_dir
-    endif
-    if exists('g:cscope_interested_files')
-        unlet g:cscope_interested_files
-    endif
-    if exists('g:cscope_ignored_dir')
-        unlet g:cscope_ignored_dir
-    endif
-    if exists('g:cscope_ignored_file')
-        unlet g:cscope_ignored_file
-    endif
-endfunction
-
-com! -nargs=0 CsCreateDb call CscopeCreateDb()
+let g:cscope_ignored_dirs = '\*\*$\|\.repo$\|\.git$\|\.svn$\|x86$\|x86_64$'
+let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$\|\.inc$\|\.S$\|\.as$\|\.asm$\|\.c++$\|\.h++$'
+let g:cscope_ignored_files = '\.bin$\|\.exe$'
 
 nnoremap <F1> <C-O>
 nnoremap <F2> :call ToggleLocationList()<CR>
@@ -206,7 +159,7 @@ nnoremap <F3> :call CscopeFind('g', expand('<cword>'))<CR>
 nnoremap <F4> :call CscopeFind('c', expand('<cword>'))<CR>
 nnoremap <F5> :call CscopeFind('s', expand('<cword>'))<CR>
 nnoremap <F6> :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <F12> :call CscopeUpdateDB()<CR>
+nnoremap <F12> :call CscopeUpdateDb()<CR>
 
 "============== LeaderF =====================
 "Searcher rg address https://github.com/BurntSushi/ripgrep/releases
